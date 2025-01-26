@@ -284,6 +284,9 @@ class BaseModel(nn.Module):
             batch (dict): Batch to compute loss on
             preds (torch.Tensor | List[torch.Tensor]): Predictions.
         """
+        # TODO check if we already have the epoch number in the batch
+        # if we have the epoch and semi-supervised is enabled; set the criterion's epoch number
+        # using: self.criterion.bce.set_epoch(epoch: int)
         if getattr(self, "criterion", None) is None:
             self.criterion = self.init_criterion()
 

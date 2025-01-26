@@ -347,6 +347,12 @@ class BaseTrainer:
                 self.scheduler.step()
 
             self.model.train()
+            # TODO if model loss is self-supervised, set the epoch
+            if hasattr(self.model, "criterion"):
+                if hasattr(self.model.criterion, "bce"):
+                    if hasattr(self.model.criterion.bce, "epoch"):
+                        print(f"For self-supervised, setting loss epoch to {epoch}")
+                        self.model.criterion.bce.epoch = epoch 
             if RANK != -1:
                 self.train_loader.sampler.set_epoch(epoch)
             pbar = enumerate(self.train_loader)

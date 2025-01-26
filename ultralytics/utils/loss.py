@@ -12,6 +12,9 @@ from ultralytics.utils.torch_utils import autocast
 from .metrics import bbox_iou, probiou
 from .tal import bbox2dist
 
+from .loss_semisupervised import BECEWithLogitsLossMulticlass
+
+SEMISUPERVISED = True
 
 class VarifocalLoss(nn.Module):
     """
@@ -163,7 +166,12 @@ class v8DetectionLoss:
         h = model.args  # hyperparameters
 
         m = model.model[-1]  # Detect() module
-        self.bce = nn.BCEWithLogitsLoss(reduction="none")
+        if SEMISUPERVISED:
+            self.epoch = 0
+            # TODO we should also set the epoch during training
+            self.bce = BECEWithLogitsLossMulticlass(reduction="none")
+        else:
+            self.bce = nn.BCEWithLogitsLoss(reduction="none")
         self.hyp = h
         self.stride = m.stride  # model strides
         self.nc = m.nc  # number of classes
